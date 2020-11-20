@@ -7,7 +7,7 @@
     tools:context=".FirstFragment">
 
     <Button
-        android:id="@+id/button_first"
+        android:id="@+id/add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="TAMBAH"
@@ -43,10 +43,13 @@
         app:layout_constraintTop_toBottomOf="@+id/tasktitle_input" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="145dp" />
+        tools:layout_editor_absoluteY="145dp"
+        tools:listitem="@layout/list_row_main"
+        />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

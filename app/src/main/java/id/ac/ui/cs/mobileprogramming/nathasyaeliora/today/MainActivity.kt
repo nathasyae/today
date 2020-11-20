@@ -7,8 +7,11 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import java.util.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -25,7 +28,6 @@ class MainActivity : AppCompatActivity() {
 
         txt = findViewById(R.id.timer_countdown)
         val intent = Intent(this, BroadcastService::class.java)
-
 
         start_button = findViewById(R.id.start_button)
         start_button.setOnClickListener {
