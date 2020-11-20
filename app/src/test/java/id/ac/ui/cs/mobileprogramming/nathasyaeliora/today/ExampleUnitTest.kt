@@ -1,4 +1,4 @@
-package id.ac.ui.cs.mobileprogramming.nathasyaeliora.today
+package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import org.junit.Test
 

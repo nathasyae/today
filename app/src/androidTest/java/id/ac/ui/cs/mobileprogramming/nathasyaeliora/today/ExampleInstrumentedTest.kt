@@ -1,4 +1,4 @@
-package id.ac.ui.cs.mobileprogramming.nathasyaeliora.today
+package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("id.ac.ui.cs.mobileprogramming.nathasyaeliora.today", appContext.packageName)
+        assertEquals("id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today", appContext.packageName)
     }
 }
