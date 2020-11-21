@@ -5,15 +5,20 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Today">
+        android:theme="@style/Theme.Today"
+        android:resizeableActivity="true"
+        android:supportsPictureInPicture="true"
+    >
         <activity
             android:name=".MainActivity"
+            android:resizeableActivity="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Today.NoActionBar">
             <intent-filter>
@@ -21,7 +26,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <layout android:defaultHeight="500dp"
+                android:defaultWidth="600dp"
+                android:gravity="top|end"
+                android:minHeight="450dp"
+                android:minWidth="300dp" />
         </activity>
+
 <!--        <service android:name=".TimerService"/>-->
         <service android:name=".service.BroadcastService"/>
     </application>
