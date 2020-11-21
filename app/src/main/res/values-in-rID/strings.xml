@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Today</string>
+    <string name="action_settings">Pengaturan</string>
+    <string name="first_fragment_label">Fragment Pertama</string>
+    <string name="second_fragment_label">Fragment Kedua</string>
+    <string name="next">Lanjut</string>
+    <string name="previous">Sebelumnya</string>
+    <string name="add_btn_title">TAMBAH</string>
+    <string name="reset_btn_title">HAPUS</string>
+    <string name="start_btn_title">MULAI</string>
+    <string name="greetings">Selamat datang! Mari selesaikan semua pekerjaanmu hari ini.</string>
+    <string name="active_task_title">Pekerjaan Aktif</string>
+    <string name="short_break_title">Istirahat Pendek</string>
+    <string name="long_break_title">Istirahat Panjang</string>
+    <string name="task_title_input_hint">Judul Pekerjaan</string>
+    <string name="task_detail_input_hint">Detail Pekerjaan</string>
+</resources>

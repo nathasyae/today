@@ -16,7 +16,7 @@
         android:layout_width="59dp"
         android:layout_height="19dp"
         android:layout_marginTop="24dp"
-        android:text="ongoing"
+        android:text="@string/active_task_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
@@ -31,17 +31,17 @@
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pomodoro" />
+            android:text="@string/pomodoro_title" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Short Break" />
+            android:text="@string/short_break_title" />
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Long Break" />
+            android:text="@string/long_break_title" />
 
     </com.google.android.material.tabs.TabLayout>
 
@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="64dp"
-            android:text="Welcome! Let’s get things done today."
+            android:text="@string/greetings"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.497"
             app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Washing dishes"
+        android:text="@string/active_task"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,7 +86,7 @@
         android:layout_marginTop="48dp"
         android:layout_marginEnd="59dp"
         android:layout_marginRight="59dp"
-        android:text="START"
+        android:text="@string/start_btn_title"
         app:layout_constraintEnd_toStartOf="@+id/reset_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/timer_countdown"
@@ -100,7 +100,7 @@
         android:layout_marginLeft="35dp"
         android:layout_marginTop="49dp"
         android:layout_weight="1"
-        android:text="RESET"
+        android:text="@string/reset_btn_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.694"
         app:layout_constraintStart_toStartOf="parent"
@@ -111,7 +111,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Task Title"
+        android:hint="@string/task_title_input_hint"
         app:layout_constraintTop_toBottomOf="@+id/start_button" />
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -126,7 +126,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:ems="10"
-        android:hint="Task Detail"
+        android:hint="@string/task_detail_input_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -136,7 +136,7 @@
         android:id="@+id/add_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ADD"
+        android:text="@string/add_btn_title"
         app:layout_constraintTop_toBottomOf="@+id/taskdetail_input"
         app:layout_constraintVertical_bias="1.0" />
 
