@@ -34,7 +34,25 @@
                 android:minWidth="300dp" />
         </activity>
 
-<!--        <service android:name=".TimerService"/>-->
+<!--        <service-->
+<!--            android:name=".AlarmService"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false"-->
+<!--            android:stopWithTask="false" />-->
+
+<!--        <receiver-->
+<!--            android:name=".AlarmBroadcastReceiver"-->
+<!--            android:enabled="true"-->
+<!--            android:exported="false">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.TIME_SET" />-->
+<!--            </intent-filter>-->
+<!--        </receiver>-->
+
+        <receiver
+            android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="false" />
         <service android:name=".service.BroadcastService"/>
     </application>
 

@@ -18,7 +18,11 @@ class TimerRepository(application: Application) {
         val db = AppDatabase.getInstance(application.applicationContext)
         timerDao = db?.timerDao()
         timers = timerDao?.getTimer()
+
+//        timerDao.insertTimer(Timer("Pomodoro", 25*60*60))
+
     }
+
 
     fun getTimers(): LiveData<List<Timer>>? {
         return timers

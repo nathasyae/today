@@ -1,13 +1,22 @@
 package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import android.Manifest
-import android.content.*
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.ContentResolver
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.SystemClock
 import android.provider.CalendarContract
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -21,14 +30,29 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_first.recycler_view
+import kotlinx.android.synthetic.main.fragment_first.*
 import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     var TAG = "Main"
     val callbackId = 42
+
+    var boolstart: Boolean = false;
+    var startTime: Long = 0;
+    var seconds:Long=0;
+    var pauseTime:Long=0;
+    var minutes:Long=0;
+    var hours:Long=0;
+    var pause:Long=0;
+
+    lateinit var display: TextView
+    lateinit var startbutton: Button
+    lateinit var pausebutton: Button
+    lateinit var stopbutton: Button
+    lateinit var handler: Handler
+    lateinit var radioGroup: RadioGroup
+
 
     lateinit var txt: TextView
     lateinit var start_button: Button
@@ -37,10 +61,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var taskTitleInput: EditText
     lateinit var taskDetailInput: EditText
     lateinit var recyclerView: RecyclerView
+    
+    lateinit var session: Timer
+    lateinit var session_str: String
+    var session_duration: Long = 0
 
     var broadcastService: BroadcastService? = null
 
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var logViewModel: LogViewModel
     private lateinit var mainAdapter: MainAdapter
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -66,6 +95,12 @@ class MainActivity : AppCompatActivity() {
             mainAdapter.setTasks(it)
         })
 
+        display = findViewById<TextView>(R.id.timer_countdown)
+        startbutton = findViewById<Button>(R.id.start_button)
+        pausebutton = findViewById<Button>(R.id.pause_button)
+        stopbutton = findViewById<Button>(R.id.reset_button)
+        handler = Handler()
+
         add_button = findViewById(R.id.add_button)
         add_button.setOnClickListener {
             mainViewModel.insertTask(
@@ -78,24 +113,99 @@ class MainActivity : AppCompatActivity() {
         taskTitleInput = findViewById(R.id.tasktitle_input)
         taskDetailInput = findViewById(R.id.taskdetail_input)
 
-        //
-        // TIMER SECTION
-        //
-        txt = findViewById(R.id.timer_countdown)
-        val intent = Intent(this, BroadcastService::class.java)
+        val runnable = object : Runnable {
 
-        start_button = findViewById(R.id.start_button)
-        start_button.setOnClickListener {
-            // broadcastService!!.startTimer()
-            startService(intent)
-            Log.i(TAG, "Started Service")
+            override fun run() {
+                if (boolstart == false) {
+                    boolstart = true
+                    display.text = "Pause"
+                } else {
+                    boolstart = false
+                    display.text = "Resume"
+                }
+                seconds = SystemClock.uptimeMillis() / 1000 + pauseTime - startTime
+                pause = seconds
+                minutes = seconds / 60
+                seconds = seconds % 60
+                hours = hours / 60
+                minutes = minutes % 60
+
+
+                display.setText(
+                    String.format("%02d", hours) + ":"
+                            + String.format("%02d", minutes) + ":"
+                            + String.format("%02d", seconds)
+                )
+
+                handler.postDelayed(this, 0)
+            }
+
+        }
+        startbutton.setOnClickListener {
+            startbutton.visibility = View.GONE
+            pausebutton.visibility = View.VISIBLE
+            startTime = SystemClock.uptimeMillis() / 1000;
+            handler.postDelayed(runnable, 0);
+            startAlarm(session_duration)
+//            logViewModel.insertLog(
+//                Log(session_str)
+//            )
         }
 
-        reset_button = findViewById(R.id.reset_button)
-        reset_button.setOnClickListener {
-            onStop()
+        pausebutton.setOnClickListener {
+            startbutton.visibility = View.VISIBLE
+            pausebutton.visibility = View.INVISIBLE
+            handler.removeCallbacks(runnable)
+            pauseTime = pause
         }
 
+        stopbutton.setOnClickListener {
+            startbutton.visibility = View.VISIBLE
+            pausebutton.visibility = View.INVISIBLE
+            pauseTime = 0;
+            handler.removeCallbacks(runnable)
+            display.setText("00:00:00")
+        }
+
+        radioGroup = findViewById(R.id.session_radio)
+    }
+
+    fun onRadioButtonClick(view: View) {
+        if (view is RadioButton) {
+            // Is the button now checked?
+            val checked = view.isChecked
+
+            // Check which radio button was clicked
+            when (view.getId()) {
+                R.id.pomodoro ->
+                    if (checked) {
+                        Log.i("RadioButton","Pomo")
+                        session_str = "Pomodoro"
+                        session_duration = 25 * 60 * 60
+                    }
+                R.id.short_break ->
+                    if (checked) {
+                        Log.i("RadioButton","S")
+                        session_str = "Short Break"
+                        session_duration = 5 * 60 * 60
+                    }
+                R.id.long_break ->
+                    if (checked) {
+                        Log.i("RadioButton","L")
+                        session_str = "Long Break"
+                        session_duration = 15 * 60 * 60
+                    }
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+        fun startAlarm(duration: Long) {
+        val millis = SystemClock.uptimeMillis() + duration
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis, pendingIntent)
     }
 
     fun addToCalendar(tasktitle: String, taskdetail: String){
@@ -160,52 +270,6 @@ class MainActivity : AppCompatActivity() {
         alert.show()
     }
 
-    //
-    // SERVICES
-    //
-    private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            //Update GUI
-            updateGUI(intent)
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        registerReceiver(broadcastReceiver, IntentFilter(BroadcastService.COUNTDOWN_BR))
-        Log.i(TAG, "Registered broadcast receiver")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        unregisterReceiver(broadcastReceiver)
-        Log.i(TAG, "Unregistered broadcast receiver")
-    }
-
-    override fun onStop() {
-        try {
-            unregisterReceiver(broadcastReceiver)
-        } catch (e: Exception) {
-            // Receiver was probably already
-        }
-        super.onStop()
-    }
-
-    override fun onDestroy() {
-        stopService(Intent(this, BroadcastService::class.java))
-        Log.i(TAG, "Stopped service")
-        super.onDestroy()
-    }
-
-    private fun updateGUI(intent: Intent) {
-        if (intent.extras != null) {
-            val millisUntilFinished = intent.getLongExtra("countdown", 30000)
-            Log.i(TAG, "Countdown seconds remaining:" + millisUntilFinished / 1000)
-            txt!!.text = java.lang.Long.toString(millisUntilFinished / 1000)
-            val sharedPreferences = getSharedPreferences(packageName, MODE_PRIVATE)
-            sharedPreferences.edit().putLong("time", millisUntilFinished).apply()
-        }
-    }
 
     private fun checkPermission(callbackId: Int, vararg permissionsId: String) {
         var permissions = true
@@ -216,21 +280,21 @@ class MainActivity : AppCompatActivity() {
         if (!permissions) ActivityCompat.requestPermissions(this, permissionsId, callbackId)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
 
 }
