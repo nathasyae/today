@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
 <!--        <service android:name=".TimerService"/>-->
-        <service android:name=".BroadcastService"/>
+        <service android:name=".service.BroadcastService"/>
     </application>
 
 </manifest>

@@ -4,6 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.dao.LogDao
+import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.dao.TaskDao
+import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.dao.TimerDao
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Log
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Timer
@@ -33,5 +36,7 @@ abstract class AppDatabase : RoomDatabase() {
             }
             return instance
         }
+
+//        private static RoomDatabase.Callback roomCallback = new RoomDatabase.Callback(){};
     }
 }

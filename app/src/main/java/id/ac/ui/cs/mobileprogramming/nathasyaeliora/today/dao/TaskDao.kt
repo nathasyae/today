@@ -3,7 +3,6 @@ package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
-import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 
 @Dao
 interface TaskDao {

@@ -1,4 +1,4 @@
-package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
+package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service
 
 import android.app.Service
 import android.content.Intent

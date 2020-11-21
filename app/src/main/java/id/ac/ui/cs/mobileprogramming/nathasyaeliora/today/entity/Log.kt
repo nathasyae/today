@@ -13,8 +13,8 @@ data class Log(
     @ColumnInfo(name = "id")
     val id: Int? = null,
 
-    @ColumnInfo(name = "date")
-    var date: Date,
+//    @ColumnInfo(name = "date")
+//    var date: Date,
 
     @ColumnInfo(name = "session_qty")
     var session_qty: Int,

@@ -16,5 +16,5 @@ interface LogDao {
     suspend fun deleteLog(log: Log)
 
     @Update
-    suspend fun updateLog(note: Note)
+    suspend fun updateLog(log: Log)
 }

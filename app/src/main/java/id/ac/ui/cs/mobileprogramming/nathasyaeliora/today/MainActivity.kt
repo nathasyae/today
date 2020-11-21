@@ -7,11 +7,10 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import java.util.ArrayList
+import androidx.lifecycle.ViewModelProvider
+import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,12 +21,16 @@ class MainActivity : AppCompatActivity() {
     lateinit var reset_button: Button
     var broadcastService: BroadcastService? = null
 
+    lateinit var mainViewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         txt = findViewById(R.id.timer_countdown)
         val intent = Intent(this, BroadcastService::class.java)
+
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         start_button = findViewById(R.id.start_button)
         start_button.setOnClickListener {
