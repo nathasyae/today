@@ -4,13 +4,13 @@ import android.Manifest
 import android.content.*
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.view.View
+import android.widget.*
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -21,7 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
-import kotlinx.android.synthetic.main.fragment_first.*
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_first.recycler_view
 import java.util.*
 
 
@@ -42,9 +43,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var mainAdapter: MainAdapter
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         checkPermission(
             callbackId,
             Manifest.permission.READ_CALENDAR,
@@ -100,8 +103,11 @@ class MainActivity : AppCompatActivity() {
         var cv: ContentValues = ContentValues()
         cv.put(CalendarContract.Events.TITLE, tasktitle)
         cv.put(CalendarContract.Events.DESCRIPTION, taskdetail)
-        cv.put(CalendarContract.Events.DTSTART,Calendar.getInstance().getTimeInMillis());
-        cv.put(CalendarContract.Events.DTEND,Calendar.getInstance().getTimeInMillis()+60*60*1000);
+        cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
+        cv.put(
+            CalendarContract.Events.DTEND,
+            Calendar.getInstance().getTimeInMillis() + 60 * 60 * 1000
+        );
         cv.put(CalendarContract.Events.CALENDAR_ID, 1)
         cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID())
         var uri: Uri = cr?.insert(CalendarContract.Events.CONTENT_URI, cv)!!
