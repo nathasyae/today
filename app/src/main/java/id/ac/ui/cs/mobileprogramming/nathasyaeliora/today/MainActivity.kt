@@ -1,16 +1,20 @@
 package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.Manifest
+import android.content.*
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.net.Uri
 import android.os.Bundle
+import android.provider.CalendarContract
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,11 +22,12 @@ import androidx.recyclerview.widget.RecyclerView
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
 import kotlinx.android.synthetic.main.fragment_first.*
-import java.time.Instant.MAX
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
     var TAG = "Main"
+    val callbackId = 42
 
     lateinit var txt: TextView
     lateinit var start_button: Button
@@ -40,6 +45,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        checkPermission(
+            callbackId,
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.WRITE_CALENDAR
+        );
 
         // MVVM SECTION
         recycler_view.layoutManager = LinearLayoutManager(this)
@@ -57,8 +67,8 @@ class MainActivity : AppCompatActivity() {
         add_button.setOnClickListener {
             mainViewModel.insertTask(
                 Task(taskTitleInput.text.toString(), taskDetailInput.text.toString())
-
             )
+            addToCalendar(taskTitleInput.text.toString(), taskDetailInput.text.toString())
         }
 
 
@@ -83,6 +93,20 @@ class MainActivity : AppCompatActivity() {
             onStop()
         }
 
+    }
+
+    fun addToCalendar(tasktitle: String, taskdetail: String){
+        var cr: ContentResolver? = this.getContentResolver()
+        var cv: ContentValues = ContentValues()
+        cv.put(CalendarContract.Events.TITLE, tasktitle)
+        cv.put(CalendarContract.Events.DESCRIPTION, taskdetail)
+        cv.put(CalendarContract.Events.DTSTART,Calendar.getInstance().getTimeInMillis());
+        cv.put(CalendarContract.Events.DTEND,Calendar.getInstance().getTimeInMillis()+60*60*1000);
+        cv.put(CalendarContract.Events.CALENDAR_ID, 1)
+        cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID())
+        var uri: Uri = cr?.insert(CalendarContract.Events.CONTENT_URI, cv)!!
+
+        Toast.makeText(this, "Successfully added to calendar", Toast.LENGTH_SHORT).show()
     }
 
     //
@@ -175,6 +199,15 @@ class MainActivity : AppCompatActivity() {
             val sharedPreferences = getSharedPreferences(packageName, MODE_PRIVATE)
             sharedPreferences.edit().putLong("time", millisUntilFinished).apply()
         }
+    }
+
+    private fun checkPermission(callbackId: Int, vararg permissionsId: String) {
+        var permissions = true
+        for (p in permissionsId) {
+            permissions =
+                permissions && ContextCompat.checkSelfPermission(this, p) == PERMISSION_GRANTED
+        }
+        if (!permissions) ActivityCompat.requestPermissions(this, permissionsId, callbackId)
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu): Boolean {
