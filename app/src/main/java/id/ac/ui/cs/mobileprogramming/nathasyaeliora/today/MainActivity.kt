@@ -1,6 +1,9 @@
 package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import android.Manifest
+import android.annotation.TargetApi
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.*
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
@@ -134,6 +137,8 @@ class MainActivity : AppCompatActivity() {
             pausebutton.visibility=View.VISIBLE
             startTime = SystemClock.uptimeMillis() / 1000;
             handler.postDelayed(runnable, 0);
+            startAlarm(10000)
+//            setScheduleNotification(10000)
         }
 
         pausebutton.setOnClickListener {
@@ -151,6 +156,37 @@ class MainActivity : AppCompatActivity() {
             display.setText("00:00:00")
         }
 
+    }
+//    @TargetApi(Build.VERSION_CODES.M)
+//    fun setScheduleNotification(duration: Long) {
+//        // membuat objek intent yang akan menjadi target selanjutnya
+//        // bisa untuk berpindah halaman dengan dan tanpa data
+//        val intent = Intent(this@MainActivity, MainActivity::class.java)
+//        intent.putExtra("key", "value")
+//
+//        // membuat objek PendingIntent yang berguna sebagai penampung intent dan aksi yang akan dikerjakan
+//        val requestCode = 0
+//        val pendingIntent =
+//            PendingIntent.getActivity(this@MainActivity, requestCode, intent, 0)
+//
+//        // membuat objek AlarmManager untuk melakukan pendaftaran alarm yang akan dijadwalkan
+//        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//
+//        // kita buat alarm yang dapat berfungsi tepat waktu dan juga walaupun dalam kondisi HP idle
+//        alarmManager.setExactAndAllowWhileIdle(
+//            AlarmManager.RTC_WAKEUP,
+//            System.currentTimeMillis() + duration,
+//            pendingIntent
+//        )
+//    }
+
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    fun startAlarm(duration: Long) {
+        val millis = SystemClock.uptimeMillis()+duration
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis, pendingIntent)
     }
 
     fun addToCalendar(tasktitle: String, taskdetail: String){
