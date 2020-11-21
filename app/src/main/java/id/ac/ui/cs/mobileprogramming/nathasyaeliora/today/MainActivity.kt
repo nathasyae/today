@@ -7,10 +7,18 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
+import kotlinx.android.synthetic.main.fragment_first.*
+import java.time.Instant.MAX
 
 
 class MainActivity : AppCompatActivity() {
@@ -19,22 +27,53 @@ class MainActivity : AppCompatActivity() {
     lateinit var txt: TextView
     lateinit var start_button: Button
     lateinit var reset_button: Button
+    lateinit var add_button: Button
+    lateinit var taskTitleInput: EditText
+    lateinit var taskDetailInput: EditText
+    lateinit var recyclerView: RecyclerView
+
     var broadcastService: BroadcastService? = null
 
-    lateinit var mainViewModel: MainViewModel
+    private lateinit var mainViewModel: MainViewModel
+    private lateinit var mainAdapter: MainAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // MVVM SECTION
+        recycler_view.layoutManager = LinearLayoutManager(this)
+        mainAdapter = MainAdapter(this) { task, i ->
+            showAlertMenu(task)
+        }
+        recycler_view.adapter = mainAdapter
+
+        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        mainViewModel.getTasks()?.observe(this, Observer {
+            mainAdapter.setTasks(it)
+        })
+
+        add_button = findViewById(R.id.add_button)
+        add_button.setOnClickListener {
+            mainViewModel.insertTask(
+                Task(taskTitleInput.text.toString(), taskDetailInput.text.toString())
+
+            )
+        }
+
+
+        taskTitleInput = findViewById(R.id.tasktitle_input)
+        taskDetailInput = findViewById(R.id.taskdetail_input)
+
+        //
+        // TIMER SECTION
+        //
         txt = findViewById(R.id.timer_countdown)
         val intent = Intent(this, BroadcastService::class.java)
 
-        mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
         start_button = findViewById(R.id.start_button)
         start_button.setOnClickListener {
-//            broadcastService!!.startTimer()
+            // broadcastService!!.startTimer()
             startService(intent)
             Log.i(TAG, "Started Service")
         }
@@ -46,6 +85,54 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //
+    // MVVM
+    //
+
+    private fun showAlertMenu(task: Task) {
+        val items = arrayOf("Edit", "Delete")
+
+        val builder =
+            AlertDialog.Builder(this)
+        builder.setItems(items) { dialog, which ->
+            // the user clicked on colors[which]
+            when (which) {
+                0 -> {
+                    showAlertDialogEdit(task)
+                }
+                1 -> {
+                    mainViewModel.deleteTask(task)
+                }
+            }
+        }
+        builder.show()
+    }
+
+    private fun showAlertDialogEdit(task: Task) {
+        val alert = AlertDialog.Builder(this)
+
+        val editText = EditText(applicationContext)
+        editText.setText(task.title)
+
+        alert.setTitle("Edit Task")
+        alert.setView(editText)
+
+        alert.setPositiveButton("Update") { dialog, _ ->
+            task.title = editText.text.toString()
+            mainViewModel.updateTask(task)
+            dialog.dismiss()
+        }
+
+        alert.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        alert.show()
+    }
+
+    //
+    // SERVICES
+    //
     private val broadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             //Update GUI
@@ -105,4 +192,6 @@ class MainActivity : AppCompatActivity() {
 //            else -> super.onOptionsItemSelected(item)
 //        }
 //    }
+
+
 }

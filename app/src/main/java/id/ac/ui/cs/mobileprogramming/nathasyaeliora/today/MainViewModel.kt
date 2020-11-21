@@ -11,16 +11,14 @@ import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.repository.TaskReposit
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var taskRepository = TaskRepository(application)
-    lateinit var tasks: LiveData<List<Task>>
-
+    private var tasks: LiveData<List<Task>>? = taskRepository.getTasks()
 
     fun insertTask(task: Task) {
         taskRepository.insert(task)
     }
 
-    @JvmName("getTasks1")
     fun getTasks(): LiveData<List<Task>>? {
-        return taskRepository.getTasks()
+        return tasks
     }
 
     fun deleteTask(task: Task) {
@@ -30,5 +28,4 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun updateTask(task: Task) {
         taskRepository.update(task)
     }
-
 }

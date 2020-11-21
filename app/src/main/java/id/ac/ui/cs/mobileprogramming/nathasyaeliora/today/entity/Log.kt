@@ -9,8 +9,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "log")
 data class Log(
     @PrimaryKey(autoGenerate = true)
-
-    @ColumnInfo(name = "id")
     val id: Int? = null,
 
 //    @ColumnInfo(name = "date")
