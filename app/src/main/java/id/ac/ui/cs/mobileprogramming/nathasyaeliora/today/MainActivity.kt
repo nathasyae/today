@@ -1,6 +1,7 @@
 package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import android.Manifest
+import android.R.attr.key
 import android.content.*
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
@@ -8,8 +9,12 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.CalendarContract
 import android.util.Log
-import android.view.View
-import android.widget.*
+import android.view.Menu
+import android.view.MenuItem
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -21,8 +26,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_first.recycler_view
+import kotlinx.android.synthetic.main.fragment_first.*
 import java.util.*
 
 
@@ -82,18 +86,22 @@ class MainActivity : AppCompatActivity() {
         // TIMER SECTION
         //
         txt = findViewById(R.id.timer_countdown)
-        val intent = Intent(this, BroadcastService::class.java)
+//        val intent = Intent(this, BroadcastService::class.java)
 
         start_button = findViewById(R.id.start_button)
         start_button.setOnClickListener {
-            // broadcastService!!.startTimer()
-            startService(intent)
+            val mIntent = Intent(this, BroadcastService::class.java)
+            mIntent.putExtra("START_BTN", "start")
+            startService(mIntent)
             Log.i(TAG, "Started Service")
         }
 
         reset_button = findViewById(R.id.reset_button)
         reset_button.setOnClickListener {
-            onStop()
+//            onDestroy()
+            val mIntent = Intent(this, BroadcastService::class.java)
+            mIntent.putExtra("START_BTN", "reset")
+            startService(mIntent)
         }
 
     }
@@ -191,6 +199,11 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
     }
 
+    fun reset(){
+        stopService(Intent(this, BroadcastService::class.java))
+        Log.i(TAG, "Stopped service")
+    }
+
     override fun onDestroy() {
         stopService(Intent(this, BroadcastService::class.java))
         Log.i(TAG, "Stopped service")
@@ -216,21 +229,21 @@ class MainActivity : AppCompatActivity() {
         if (!permissions) ActivityCompat.requestPermissions(this, permissionsId, callbackId)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
 
 }

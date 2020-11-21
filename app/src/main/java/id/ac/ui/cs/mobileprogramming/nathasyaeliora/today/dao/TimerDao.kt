@@ -17,4 +17,9 @@ interface TimerDao {
 
     @Update
     suspend fun updateTimer(timer: Timer)
+
+    @Query("SELECT * FROM timer WHERE id=:id ")
+    fun getTimerById(id: Int): LiveData<Timer>
+
+
 }

@@ -49,6 +49,8 @@ class TaskViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         itemView.setOnClickListener {
             listener(task, layoutPosition)
         }
+        
+        
     }
 
 }

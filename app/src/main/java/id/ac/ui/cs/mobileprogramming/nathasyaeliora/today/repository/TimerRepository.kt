@@ -24,6 +24,10 @@ class TimerRepository(application: Application) {
         return timers
     }
 
+    fun getTimerById(id: Int): LiveData<Timer>? {
+        return getTimerById(id)
+    }
+
     fun insert(timer: Timer) = runBlocking {
         this.launch(Dispatchers.IO) {
             timerDao?.insertTimer(timer)
