@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
-    fun startAlarm(duration: Long) {
+        fun startAlarm(duration: Long) {
         val millis = SystemClock.uptimeMillis() + duration
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
