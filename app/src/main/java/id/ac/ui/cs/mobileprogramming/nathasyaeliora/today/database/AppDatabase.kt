@@ -17,6 +17,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun logDao(): LogDao
     abstract fun timerDao(): TimerDao
 
+
     companion object {
 
         private const val DB_NAME = "TODAY_DB"

@@ -1,10 +1,12 @@
 package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import android.Manifest
-import android.annotation.TargetApi
 import android.app.AlarmManager
 import android.app.PendingIntent
-import android.content.*
+import android.content.ContentResolver
+import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.net.Uri
 import android.os.Build
@@ -13,6 +15,8 @@ import android.os.Handler
 import android.os.SystemClock
 import android.provider.CalendarContract
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -26,8 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.entity.Task
 import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.service.BroadcastService
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_first.recycler_view
+import kotlinx.android.synthetic.main.fragment_first.*
 import java.util.*
 
 
@@ -48,6 +51,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var pausebutton: Button
     lateinit var stopbutton: Button
     lateinit var handler: Handler
+    lateinit var radioGroup: RadioGroup
 
 
     lateinit var txt: TextView
@@ -57,10 +61,15 @@ class MainActivity : AppCompatActivity() {
     lateinit var taskTitleInput: EditText
     lateinit var taskDetailInput: EditText
     lateinit var recyclerView: RecyclerView
+    
+    lateinit var session: Timer
+    lateinit var session_str: String
+    var session_duration: Long = 0
 
     var broadcastService: BroadcastService? = null
 
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var logViewModel: LogViewModel
     private lateinit var mainAdapter: MainAdapter
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -133,56 +142,66 @@ class MainActivity : AppCompatActivity() {
 
         }
         startbutton.setOnClickListener {
-            startbutton.visibility= View.GONE
-            pausebutton.visibility=View.VISIBLE
+            startbutton.visibility = View.GONE
+            pausebutton.visibility = View.VISIBLE
             startTime = SystemClock.uptimeMillis() / 1000;
             handler.postDelayed(runnable, 0);
-            startAlarm(10000)
-//            setScheduleNotification(10000)
+            startAlarm(session_duration)
+//            logViewModel.insertLog(
+//                Log(session_str)
+//            )
         }
 
         pausebutton.setOnClickListener {
-            startbutton.visibility= View.VISIBLE
-            pausebutton.visibility=View.INVISIBLE
+            startbutton.visibility = View.VISIBLE
+            pausebutton.visibility = View.INVISIBLE
             handler.removeCallbacks(runnable)
-            pauseTime=pause
+            pauseTime = pause
         }
 
         stopbutton.setOnClickListener {
-            startbutton.visibility=View.VISIBLE
-            pausebutton.visibility=View.INVISIBLE
-            pauseTime=0;
+            startbutton.visibility = View.VISIBLE
+            pausebutton.visibility = View.INVISIBLE
+            pauseTime = 0;
             handler.removeCallbacks(runnable)
             display.setText("00:00:00")
         }
 
+        radioGroup = findViewById(R.id.session_radio)
     }
-//    @TargetApi(Build.VERSION_CODES.M)
-//    fun setScheduleNotification(duration: Long) {
-//        // membuat objek intent yang akan menjadi target selanjutnya
-//        // bisa untuk berpindah halaman dengan dan tanpa data
-//        val intent = Intent(this@MainActivity, MainActivity::class.java)
-//        intent.putExtra("key", "value")
-//
-//        // membuat objek PendingIntent yang berguna sebagai penampung intent dan aksi yang akan dikerjakan
-//        val requestCode = 0
-//        val pendingIntent =
-//            PendingIntent.getActivity(this@MainActivity, requestCode, intent, 0)
-//
-//        // membuat objek AlarmManager untuk melakukan pendaftaran alarm yang akan dijadwalkan
-//        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//
-//        // kita buat alarm yang dapat berfungsi tepat waktu dan juga walaupun dalam kondisi HP idle
-//        alarmManager.setExactAndAllowWhileIdle(
-//            AlarmManager.RTC_WAKEUP,
-//            System.currentTimeMillis() + duration,
-//            pendingIntent
-//        )
-//    }
+
+    fun onRadioButtonClick(view: View) {
+        if (view is RadioButton) {
+            // Is the button now checked?
+            val checked = view.isChecked
+
+            // Check which radio button was clicked
+            when (view.getId()) {
+                R.id.pomodoro ->
+                    if (checked) {
+                        Log.i("RadioButton","Pomo")
+                        session_str = "Pomodoro"
+                        session_duration = 25 * 60 * 60
+                    }
+                R.id.short_break ->
+                    if (checked) {
+                        Log.i("RadioButton","S")
+                        session_str = "Short Break"
+                        session_duration = 5 * 60 * 60
+                    }
+                R.id.long_break ->
+                    if (checked) {
+                        Log.i("RadioButton","L")
+                        session_str = "Long Break"
+                        session_duration = 15 * 60 * 60
+                    }
+            }
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
     fun startAlarm(duration: Long) {
-        val millis = SystemClock.uptimeMillis()+duration
+        val millis = SystemClock.uptimeMillis() + duration
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
@@ -261,21 +280,21 @@ class MainActivity : AppCompatActivity() {
         if (!permissions) ActivityCompat.requestPermissions(this, permissionsId, callbackId)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
 
 }

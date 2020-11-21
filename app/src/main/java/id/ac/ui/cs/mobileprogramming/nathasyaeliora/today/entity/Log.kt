@@ -8,16 +8,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "log")
 data class Log(
+    @ColumnInfo(name = "session")
+    var session: String,
     @PrimaryKey(autoGenerate = true)
     val id: Int? = null,
-
-//    @ColumnInfo(name = "date")
-//    var date: Date,
-
-    @ColumnInfo(name = "session_qty")
-    var session_qty: Int,
-
-    @ColumnInfo(name = "task_completed_qty")
-    var task_completed_qty: Int,
-
-)
+    )
