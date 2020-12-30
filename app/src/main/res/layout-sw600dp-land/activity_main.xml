@@ -30,157 +30,177 @@
 
 
     <ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/greetings_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="64dp"
-                    android:text="@string/greetings" />
-
-                <com.google.android.material.tabs.TabLayout
-                    android:id="@+id/tabLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/pomodoro_title" />
-
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/short_break_title" />
-
-                    <com.google.android.material.tabs.TabItem
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/long_break_title" />
-
-                </com.google.android.material.tabs.TabLayout>
-
-                <TextView
-                    android:id="@+id/activetask_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/active_task" />
-
-                <TextView
-                    android:id="@+id/ongoing_text"
-                    android:layout_width="59dp"
-                    android:layout_height="19dp"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/active_task_title" />
-
-                <TextView
-                    android:id="@+id/timer_countdown"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
-                    android:text="25:00" />
+                android:orientation="horizontal">
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
 
-                    <Button
-                        android:id="@+id/start_button"
+                    <TextView
+                        android:id="@+id/greetings_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="88dp"
-                        android:layout_marginLeft="88dp"
-                        android:layout_marginTop="48dp"
-                        android:layout_marginEnd="59dp"
-                        android:layout_marginRight="59dp"
-                        android:text="@string/start_btn_title" />
+                        android:layout_marginTop="64dp"
+                        android:text="@string/greetings"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tabLayout" />
 
-                    <Button
-                        android:id="@+id/reset_button"
+                    <RadioGroup
+                        android:id="@+id/session_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="35dp"
-                        android:layout_marginLeft="35dp"
-                        android:layout_marginTop="49dp"
-                        android:layout_weight="1"
-                        android:text="@string/reset_btn_title" />
+                        android:orientation="horizontal"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/greetings_text">
+
+                        <RadioButton
+                            android:id="@+id/pomodoro"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/pomodoro_title"
+                            android:onClick="onRadioButtonClick"/>
+
+                        <RadioButton
+                            android:id="@+id/short_break"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="onRadioButtonClick"
+                            android:text="@string/short_break_title" />
+
+                        <RadioButton
+                            android:id="@+id/long_break"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/long_break_title"
+                            android:onClick="onRadioButtonClick"/>
+                    </RadioGroup>
+
+                    <TextView
+                        android:id="@+id/ongoing_text"
+                        android:layout_width="59dp"
+                        android:layout_height="19dp"
+                        android:text="@string/active_task_title" />
+
+                    <TextView
+                        android:id="@+id/activetask_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/active_task"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:id="@+id/timer_countdown"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="32dp"
+                        android:text="00:00:00"
+                        android:textSize="42dp" />
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center">
+
+                        <Button
+                            android:id="@+id/start_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/start_btn_title"
+                            android:layout_marginLeft="32dp"
+                            android:layout_marginRight="32dp"
+                            android:layout_marginTop="32dp"
+                            app:layout_constraintEnd_toStartOf="@+id/reset_button"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/timer_countdown" />
+
+                        <Button
+                            android:id="@+id/pause_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/pause_btn_title"
+                            android:visibility="gone"
+                            app:layout_constraintEnd_toStartOf="@+id/reset_button"
+                            app:layout_constraintHorizontal_bias="0.0"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/timer_countdown" />
+
+                        <Button
+                            android:id="@+id/reset_button"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginLeft="32dp"
+                            android:layout_marginRight="32dp"
+                            android:layout_marginTop="32dp"
+                            android:text="@string/reset_btn_title"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/timer_countdown" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <EditText
+                        android:id="@+id/tasktitle_input"
+                        android:layout_marginTop="64dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:hint="@string/task_title_input_hint" />
+
+                    <EditText
+                        android:id="@+id/taskdetail_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:hint="@string/task_detail_input_hint" />
+
+                    <Button
+                        android:id="@+id/add_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/add_btn_title" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        tools:listitem="@layout/list_row_main" />
+
                 </LinearLayout>
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical">
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <EditText
-                    android:id="@+id/tasktitle_input"
-                    android:layout_marginTop="64dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/task_title_input_hint" />
-
-                <EditText
-                    android:id="@+id/taskdetail_input"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:ems="10"
-                    android:hint="@string/task_detail_input_hint" />
-
-                <Button
-                    android:id="@+id/add_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_btn_title" />
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    tools:listitem="@layout/list_row_main" />
-
-            </LinearLayout>
-        </LinearLayout><![CDATA[
-
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-
-
-        ]]>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</ScrollView>
-
-
-    <!--    <include layout="@layout/content_main" />-->
-
+    </ScrollView>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
