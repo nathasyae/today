@@ -5,6 +5,12 @@
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- opengl -->
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
 
     <application
         android:allowBackup="true"
@@ -16,6 +22,15 @@
         android:resizeableActivity="true"
         android:supportsPictureInPicture="true"
     >
+
+        <activity android:name=".SplashActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:resizeableActivity="true"
@@ -33,6 +48,15 @@
                 android:minHeight="450dp"
                 android:minWidth="300dp" />
         </activity>
+
+        <activity android:name=".AnimationActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
 
 <!--        <service-->
 <!--            android:name=".AlarmService"-->
@@ -54,6 +78,10 @@
             android:enabled="true"
             android:exported="false" />
         <service android:name=".service.BroadcastService"/>
+
+
+
     </application>
+
 
 </manifest>
