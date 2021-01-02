@@ -8,12 +8,17 @@
     android:background="@color/purple_700"
     tools:context=".AnimationActivity">
 
-<ImageView
-    android:id="@+id/rocket"
-    android:layout_width="100dp"
-    android:layout_height="100dp"
-    android:background="@android:color/transparent"
-    android:layout_gravity="center|center_horizontal"
-    android:src="@drawable/logo_appbar" />
+    <OGLView
+        android:id="@+id/oglView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+<!--<ImageView-->
+<!--    android:id="@+id/rocket"-->
+<!--    android:layout_width="100dp"-->
+<!--    android:layout_height="100dp"-->
+<!--    android:background="@android:color/transparent"-->
+<!--    android:layout_gravity="center|center_horizontal"-->
+<!--    android:src="@drawable/logo_appbar" />-->
 
 </FrameLayout>

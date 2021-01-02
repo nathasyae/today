@@ -76,6 +76,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
 
+
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$room_version"
 
@@ -83,8 +84,6 @@ dependencies {
     testImplementation "androidx.room:room-testing:$room_version"
 
     implementation "com.google.android.material:material:1.1.0"
-    implementation "android.arch.persistence.room:runtime:1.1.1"
-    kapt "android.arch.persistence.room:compiler:1.1.1"
 
     // RecyclerView
     implementation "androidx.recyclerview:recyclerview:1.1.0"
