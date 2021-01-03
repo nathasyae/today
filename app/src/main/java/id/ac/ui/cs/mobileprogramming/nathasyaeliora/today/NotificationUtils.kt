@@ -28,7 +28,9 @@ class  NotificationUtils(base: Context) : ContextWrapper(base) {
     // Create channel for Android version 26+
     @TargetApi(Build.VERSION_CODES.O)
     private fun createChannels() {
-        val channel = NotificationChannel(MYCHANNEL_ID, MYCHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH)
+        val channel = NotificationChannel(
+            MYCHANNEL_ID, MYCHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH)
         channel.enableVibration(true)
 
         getManager().createNotificationChannel(channel)
@@ -36,7 +38,8 @@ class  NotificationUtils(base: Context) : ContextWrapper(base) {
 
     // Get Manager
     fun getManager() : NotificationManager {
-        if (manager == null) manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (manager == null) manager = getSystemService(Context.NOTIFICATION_SERVICE)
+                as NotificationManager
         return manager as NotificationManager
     }
 
@@ -44,7 +47,8 @@ class  NotificationUtils(base: Context) : ContextWrapper(base) {
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+        val pendingIntent = PendingIntent.getActivity(
+            this, 0, intent, 0)
         return NotificationCompat.Builder(applicationContext, MYCHANNEL_ID)
             .setContentTitle("Alarm!")
             .setContentText("Your AlarmManager is working.")

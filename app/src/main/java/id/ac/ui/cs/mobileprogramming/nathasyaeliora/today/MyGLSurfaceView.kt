@@ -1,10 +1,10 @@
-package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.OpenGL
+package id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today
 
 import android.content.Context
 import android.opengl.GLSurfaceView
-import id.ac.ui.cs.mobileprogramming.nathasyaeliora.Today.SplashActivity
 
 class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
+
     private val renderer: MyGLRenderer
 
     init {
@@ -17,4 +17,7 @@ class MyGLSurfaceView(context: Context) : GLSurfaceView(context) {
         // Set the Renderer for drawing on the GLSurfaceView
         setRenderer(renderer)
     }
+
+
 }
+

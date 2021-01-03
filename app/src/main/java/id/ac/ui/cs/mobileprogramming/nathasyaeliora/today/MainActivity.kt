@@ -36,18 +36,8 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     var TAG = "Main"
-    var permission_bool = false
-    val callbackId = 42
 
     private val RECORD_REQUEST_CODE = 101
-
-    var boolstart: Boolean = false;
-    var startTime: Long = 0;
-    var seconds: Long = 0;
-    var pauseTime: Long = 0;
-    var minutes: Long = 0;
-    var hours: Long = 0;
-    var pause: Long = 0;
 
     lateinit var display: TextView
     lateinit var startbutton: Button
@@ -65,11 +55,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var taskDetailInput: EditText
     lateinit var recyclerView: RecyclerView
 
-    lateinit var session: Timer
     lateinit var session_str: String
     var session_duration: Long = 0
-
-    var broadcastService: BroadcastService? = null
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var logViewModel: LogViewModel
@@ -102,104 +89,77 @@ class MainActivity : AppCompatActivity() {
 
         add_button = findViewById(R.id.add_button)
         add_button.setOnClickListener {
-//            if(checkPermission(this)){
-//                addTask()
-//            } else{
-//                askPermission()
-//            }
             permission_fn()
         }
 
         taskTitleInput = findViewById(R.id.tasktitle_input)
         taskDetailInput = findViewById(R.id.taskdetail_input)
 
-        val runnable = object : Runnable {
-
-            override fun run() {
-                if (boolstart == false) {
-                    boolstart = true
-                    display.text = "Pause"
-                } else {
-                    boolstart = false
-                    display.text = "Resume"
-                }
-                seconds = SystemClock.uptimeMillis() / 1000 + pauseTime - startTime
-                pause = seconds
-                minutes = seconds / 60
-                seconds = seconds % 60
-                hours = hours / 60
-                minutes = minutes % 60
-
-                display.setText(
-                        String.format("%02d", hours) + ":"
-                                + String.format("%02d", minutes) + ":"
-                                + String.format("%02d", seconds)
-                )
-
-                handler.postDelayed(this, 0)
-            }
-
-        }
 
         startbutton.setOnClickListener {
-            startbutton.visibility = View.GONE
-            pausebutton.visibility = View.VISIBLE
-            startTime = SystemClock.uptimeMillis() / 1000;
-            handler.postDelayed(runnable, 0);
-            startAlarm(session_duration)
+            startService(Intent(this, BroadcastService::class.java))
+            Log.i(TAG, "Started service")
+            startAlarm(30000)
         }
 
-        pausebutton.setOnClickListener {
-            startbutton.visibility = View.VISIBLE
-            pausebutton.visibility = View.INVISIBLE
-            handler.removeCallbacks(runnable)
-            pauseTime = pause
-        }
 
         stopbutton.setOnClickListener {
-            startbutton.visibility = View.VISIBLE
-            pausebutton.visibility = View.INVISIBLE
-            pauseTime = 0;
-            handler.removeCallbacks(runnable)
-            display.setText("00:00:00")
+            stopService(Intent(this, BroadcastService::class.java))
+            Log.i(TAG, "Stopped service")
+            display.setText("00:00")
         }
 
         radioGroup = findViewById(R.id.session_radio)
     }
 
+    // SERVICES
 
-    private fun checkPermission(context: Context): Boolean {
-        val permission = Manifest.permission.WRITE_CALENDAR
-        val res: Int = context.checkCallingOrSelfPermission(permission)
-        return res == PERMISSION_GRANTED
-    }
-
-    fun askPermission() {
-        val permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_CALENDAR)
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            Log.i(TAG, "Permission to record denied")
-            Toast.makeText(this, "denied", Toast.LENGTH_SHORT).show()
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                            Manifest.permission.WRITE_CALENDAR)) {
-                val builder = AlertDialog.Builder(this)
-                builder.setMessage("Permission to access the microphone is required for this app to record audio.")
-                        .setTitle("Permission required")
-
-                builder.setPositiveButton("OK"
-                ) { dialog, id ->
-                    Log.i(TAG, "Clicked")
-                    makeRequest()
-                }
-
-                val dialog = builder.create()
-                dialog.show()
-            } else {
-                makeRequest()
+    val br: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null) {
+                updateGUI(intent)
             }
         }
     }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(br, IntentFilter(BroadcastService.COUNTDOWN_BR))
+        Log.i(TAG, "Registered broacast receiver")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(br)
+        Log.i(TAG, "Unregistered broacast receiver")
+    }
+
+    override fun onStop() {
+        try {
+            unregisterReceiver(br)
+        } catch (e: Exception) {
+            // Receiver was probably already stopped in onPause()
+        }
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        stopService(Intent(this, BroadcastService::class.java))
+        Log.i(TAG, "Stopped service")
+        super.onDestroy()
+    }
+
+    private fun updateGUI(intent: Intent) {
+        if (intent.extras != null) {
+            val millisUntilFinished = intent.getLongExtra("countdown", 0)
+            display.setText(
+                String.format("%02d", (millisUntilFinished /1000 / 60)% 60)
+                        + ":" + String.format("%02d", millisUntilFinished / 1000 % 60))
+            Log.i(TAG, "Countdown seconds remaining: " + millisUntilFinished / 1000)
+        }
+    }
+
+   // JNI
 
     external fun getGreeting(hour: Int): String
 
@@ -209,64 +169,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun makeRequest() {
-        ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.WRITE_CALENDAR),
-                RECORD_REQUEST_CODE)
-        Toast.makeText(this, "requested", Toast.LENGTH_SHORT).show()
-    }
+    // ADD TASK
 
     fun addTask() {
         if (checkConnectivity(this)) {
             mainViewModel.insertTask(
-                    Task(taskTitleInput.text.toString(), taskDetailInput.text.toString())
+                Task(taskTitleInput.text.toString(), taskDetailInput.text.toString())
             )
             addToCalendar(taskTitleInput.text.toString(), taskDetailInput.text.toString())
 
         } else {
-            Toast.makeText(this, "Can't save. Please turn on the wifi/mobile data", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                this,
+                "Can't save. Please turn on the wifi/mobile data",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
-    private fun setupPermissions() {
-        val permission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_CALENDAR)
-
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-        Log.i(TAG, "Permission to record denied")
-        Toast.makeText(this, "denied", Toast.LENGTH_SHORT).show()
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.WRITE_CALENDAR)) {
-            val builder = AlertDialog.Builder(this)
-            builder.setMessage("Permission to access the microphone is required for this app to record audio.")
-                    .setTitle("Permission required")
-
-            builder.setPositiveButton("OK"
-            ) { dialog, id ->
-                Log.i(TAG, "Clicked")
-                makeRequest()
-            }
-
-            val dialog = builder.create()
-            dialog.show()
-        } else {
-            makeRequest()
-        }
-    }
-}
-
-    @RequiresApi(Build.VERSION_CODES.M)
-    private fun checkPermission(callbackId: Int, vararg permissionsId: String): Boolean {
-        var permissions = true
-        for (p in permissionsId) {
-            permissions =
-                    permissions && ContextCompat.checkSelfPermission(this, p) == PERMISSION_GRANTED
-        }
-
-//        if (!permissions) ActivityCompat.requestPermissions(this, permissionsId, callbackId)
-        return permissions
-
-    }
 
     fun onRadioButtonClick(view: View) {
         if (view is RadioButton) {
@@ -299,11 +219,16 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.KITKAT)
         fun startAlarm(duration: Long) {
-        val millis = SystemClock.uptimeMillis() + duration
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
-        alarmManager.setExact(AlarmManager.RTC_WAKEUP, millis, pendingIntent)
+            val millis = SystemClock.uptimeMillis() + duration
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(this, AlarmReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0)
+            Log.i("millis",millis.toString())
+            alarmManager.set(
+                AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + duration,
+                pendingIntent
+            )
     }
 
     fun addToCalendar(tasktitle: String, taskdetail: String){
@@ -313,8 +238,8 @@ class MainActivity : AppCompatActivity() {
         cv.put(CalendarContract.Events.DESCRIPTION, taskdetail)
         cv.put(CalendarContract.Events.DTSTART, Calendar.getInstance().getTimeInMillis());
         cv.put(
-                CalendarContract.Events.DTEND,
-                Calendar.getInstance().getTimeInMillis() + 60 * 60 * 1000
+            CalendarContract.Events.DTEND,
+            Calendar.getInstance().getTimeInMillis() + 60 * 60 * 1000
         );
         cv.put(CalendarContract.Events.CALENDAR_ID, 1)
         cv.put(CalendarContract.Events.EVENT_TIMEZONE, Calendar.getInstance().getTimeZone().getID())
@@ -374,59 +299,43 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-//    fun onCreateOptionsMenu(menu: Menu): Boolean {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        menuInflater.inflate(R.menu.menu_main, menu)
-//        return true
-//    }
-//
-//    fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        return when (item.itemId) {
-//            R.id.action_settings -> true
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
-
     private fun requestCalendarPermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(
-                        this,
-                        Manifest.permission.WRITE_CALENDAR
-                )
+                this,
+                Manifest.permission.WRITE_CALENDAR
+            )
         ) {
             ActivityCompat.requestPermissions(
-                    this@MainActivity,
-                    arrayOf(Manifest.permission.WRITE_CALENDAR),
-                    REQUEST_PERMISSION
+                this@MainActivity,
+                arrayOf(Manifest.permission.WRITE_CALENDAR),
+                REQUEST_PERMISSION
             )
 
         } else {
             ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.WRITE_CALENDAR),
-                    REQUEST_PERMISSION
+                this,
+                arrayOf(Manifest.permission.WRITE_CALENDAR),
+                REQUEST_PERMISSION
             )
         }
     }
 
     private fun permission_fn() {
         if (ContextCompat.checkSelfPermission(
-                        this@MainActivity,
-                        Manifest.permission.WRITE_CALENDAR
-                ) == PackageManager.PERMISSION_GRANTED
+                this@MainActivity,
+                Manifest.permission.WRITE_CALENDAR
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(
-                            this@MainActivity,
-                            Manifest.permission.WRITE_CALENDAR
-                    )
+                    this@MainActivity,
+                    Manifest.permission.WRITE_CALENDAR
+                )
             ) {
             } else {
                 ActivityCompat.requestPermissions(
-                        this,
-                        arrayOf(Manifest.permission.WRITE_CALENDAR),
-                        REQUEST_PERMISSION
+                    this,
+                    arrayOf(Manifest.permission.WRITE_CALENDAR),
+                    REQUEST_PERMISSION
                 )
             }
         } else {
@@ -437,9 +346,9 @@ class MainActivity : AppCompatActivity() {
     val REQUEST_PERMISSION = 1
 
     override fun onRequestPermissionsResult(
-            requestCode: Int,
-            permissions: Array<String>,
-            grantResults: IntArray
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_PERMISSION) {
@@ -454,15 +363,15 @@ class MainActivity : AppCompatActivity() {
                         .setTitle("Permission Needed")
                         .setMessage("Calendar permission is needed to add task to your calendar. Please Allow.")
                         .setPositiveButton("OK",
-                                DialogInterface.OnClickListener { dialog, which ->
-                                    ActivityCompat.requestPermissions(
-                                            this@MainActivity,
-                                            arrayOf(Manifest.permission.WRITE_CALENDAR),
-                                            REQUEST_PERMISSION
-                                    )
-                                })
+                            DialogInterface.OnClickListener { dialog, which ->
+                                ActivityCompat.requestPermissions(
+                                    this@MainActivity,
+                                    arrayOf(Manifest.permission.WRITE_CALENDAR),
+                                    REQUEST_PERMISSION
+                                )
+                            })
                         .setNegativeButton("Cancel",
-                                DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() }).create()
+                            DialogInterface.OnClickListener { dialog, which -> dialog.dismiss() }).create()
                         .show()
                 Toast.makeText(this, "Please allow the Permission", Toast.LENGTH_SHORT).show()
             }
